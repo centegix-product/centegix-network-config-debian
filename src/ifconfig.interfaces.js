@@ -8,6 +8,8 @@ var INET = 'inet';
 var BCAST = 'broadcast';
 var DESTINATIONS = ['default', 'link-local'];
 
+var fs = require('fs');
+
 module.exports = function (cp) {
   return function (f) {
     // @todo add command timeout
@@ -29,15 +31,26 @@ module.exports = function (cp) {
           return f(stderr);
         }
 
-        f(null, parse(ifConfigOut, routeOut));
+        fs.readFile('/etc/network/interfaces', {
+          encoding: 'utf8'
+        }, function (err, content) {
+          if (err) {
+            return f(err);
+          }
+          f(null, parse(ifConfigOut, routeOut, content));
+        });
       });
     });
   };
 };
 
-function parse(ifConfigOut, routeOut) {
+function parse(ifConfigOut, routeOut, content) {
   return ifConfigOut.split('\n\n').map(function (inface) {
     var lines = inface.split('\n');
+    var ifName = getInterfaceName(_.first(lines));
+    var tmp = `iface ${ifName} inet static`;
+    var use_dhcp = !_.includes(content, tmp);
+    // console.log(`========\nifName:${ifName}\nuse_dhcp:${use_dhcp}\n========`);
 
     /**
      * Format 1
@@ -49,13 +62,14 @@ function parse(ifConfigOut, routeOut) {
      */
 
     return {
-      name: getInterfaceName(_.first(lines)),
+      name: ifName,
       ip: getInterfaceIpAddr(lines[1]),
       netmask: getInterfaceNetmaskAddr(lines[1]),
       broadcast: getBroadcastAddr(lines[1]),
       // mac: getInterfaceMacAddr(_.first(lines)),
       mac: getInterfaceMacAddr(lines[2]),
-      gateway: getGateway(routeOut)
+      gateway: getGateway(routeOut),
+      use_dhcp: use_dhcp
     };
   });
 }
