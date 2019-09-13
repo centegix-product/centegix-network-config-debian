@@ -3,6 +3,12 @@
     "name": "DerekChungxx",
     "email": "derekchunggw@gmail.com"
   },
+  "contributors": [
+    {
+      "name": "CentegixNick",
+      "email": "nmccormack@centegix.com"
+    }
+  ],
   "dependencies": {
     "lodash": ">=4.17.6",
     "when": "^3.7.2"
@@ -24,7 +30,7 @@
   ],
   "license": "MIT",
   "main": "index.js",
-  "name": "network-config-debian",
+  "name": "centegix-network-config-debian",
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/DerekChungxx/network-config-debian.git"

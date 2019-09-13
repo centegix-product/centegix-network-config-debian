@@ -166,7 +166,8 @@ function getBroadcastAddr(line) {
  */
 function getGateway(stdout) {
   // @todo yep. this is ugly.
-  return stdout
+  try {
+    return stdout
     .split('\n')
     .filter(function (line) {
       return _.some(DESTINATIONS, function (destination)  {
@@ -176,4 +177,8 @@ function getGateway(stdout) {
     .split(/\s+/)[1]
     // .split('.')[0]
     .replace(/-/g, '.');
+  } catch (e) {
+    console.log(e)
+    return null
+  }
 }
